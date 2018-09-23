@@ -5,12 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Asteroids</title>
+    <link rel="stylesheet" type="text/css" href="default.css" /> 
 </head>
 <body>
     <div id="canvas">
-        <div id="myship"></div>
-        <div id="enemyship"></div>
-        <div id="aseroids"></div>
+        <div id="myShip"></div>
+        <div id="enemyShip"></div>
+        <div class="asteroids"></div>
     </div>
+    <script src="app.js"></script>
+    <script src="GameState.js"></script>
+    <script src="Ship.js"></script>
+    <script src="Point.js"></script>
+    <script src="Bullet.js"></script>
+    <script src="Command.js"></script>
+    <script src="Asteroid.js"></script>
+    <script>
+window.onload = function() {
+var myShip = document.getElementById("myShip");
+var point = new Point();
+var gameState = new GameState("myShip");
+var shipPos = new Point();
+gameState.myShip.pos = getPos(myShip);
+
+var viewPortWidth, viewPortHeight;
+if (typeof window.innerWidth != 'undefined')
+{
+    viewPortHeight = window.innerHeight;
+    viewPortWidth = window.innerWidth;
+}
+
+document.addEventListener("keydown", function(event){
+    var key = event.which || event.keyCode;
+    
+
+    if(key == 119 || key == 87) {
+        var style = setStyle(true);
+        if (shipPos.x <= 99 && shipPos.y <= 99)
+            myShip.style.cssText = style;
+        else
+            myShip.style.cssText = "left: 0; top: 0;";
+    }
+    else if(key == 100 || key == 68)
+    {
+        gameState.myShip.heading += .1;
+        var style = setStyle(false);
+        myShip.style.cssText = style;
+    }
+    else if(key == 97 || key == 65)
+    {
+        gameState.myShip.heading += -.1;
+        var style = setStyle(false);
+        myShip.style.cssText = style;
+    }
+})
+
+function setStyle(move)
+{
+    gameState.myShip.pos = getPos(myShip);
+    shipPos = convertPos(gameState.myShip.pos);
+    if(move)
+        return "left: " + (shipPos.x+1) + "%; top: " + (shipPos.y+1) + "%; transform: rotate("+gameState.myShip.heading+"rad);";
+    return "left: " + shipPos.x + "%; top: " + shipPos.y + "%; transform: rotate("+gameState.myShip.heading+"rad);";
+}
+
+function getPos(elem)
+{
+    var point = new Point();
+    
+    let coords = elem.getBoundingClientRect();
+    point.x = coords.left/100;
+    point.y = coords.top/100;
+    
+    return point;
+}
+function convertPos(point){
+    var pos = new Point();
+    pos.x = (point.x*100*100/viewPortWidth);
+    pos.y = (point.y*100*100/viewPortHeight);
+    return pos;
+}
+}
+    </script>
 </body>
 </html>
