@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Asteroids</title>
+    <link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        
+        function concatJSON(arry) {
+            var val = "";
+            for (i = 0; i < this.arry.length; i++) {
+                if (i == this.asteroids.length - 1)
+                    val.concat(this.arry[i].json);
+                else
+                    val.concat(this.arry[i].json + ",");
+            }
+            return JSON.parse(val);
+        }
+
+        class Asteroid {
+            constructor() {
+                this.pos = new Point();
+                this.pos = new Point();
+                this.size = 0.0;
+            }
+            json() {
+                return this.json = {
+                    "pos": {
+                        "x": this.pos.x,
+                        "y": this.pos.y
+                    },
+                    "pos": {
+                        "x": this.pos.x,
+                        "y": this.pos.y
+                    },
+                    "size": this.size
+                }
+            }
+        }
+
+        class Bullet {
+            constructor() {
+                this.pos = new Point;
+                this.pos = new Point;
+                this.ttl = 0.0;
+            }
+            json() {
+                return this.json = {
+                    "pos": {
+                        "x": this.pos.x,
+                        "y": this.pos.y
+                    },
+                    "pos": {
+                        "x": this.pos.x,
+                        "y": this.pos.y
+                    },
+                    "ttl": this.ttl
+                }
+            }
+        }
+
+        class Command {
+            constructor() {
+                this.shoot = false;
+                this.accel = false;
+                this.right = false;
+                this.left = false;
+            }
+        }
+
+        class GameState {
+            constructor() {
+                this.myShip = new Ship("myShip");
+                this.enemy = new Ship("enemy");
+                this.bullets = [];
+                this.asteroids = [];
+            }
+
+            get gamejson() {
+                return json = {
+                    this: myShip.json,
+                    this: enemy.json,
+                    "asteroids": [
+                        concatJSON(this.asteroids)
+                    ],
+                    "bullets": [
+                        concatJSON(this.bullets)
+                    ]
+                }
+            }
+            set enemyjson(val) {
+                this.enemy.json = val;
+            }
+        }
+
+    </script>
+    <script>
+        const FPS = 30; // frames per second
+        const FRICTION = 0.7; // friction coefficient of space (0 = no friction, 1 = lots of friction)
+        const SHIP_SIZE = 30; // ship height in pixels
+        const SHIP_THRUST = 5; // acceleration of the ship in pixels per second per second
+        const TURN_SPEED = 360; // turn speed in degrees per second
+
+        var canv = document.getElementById("canvas");
+        var ctx = canv.getContext("2d");
+
+        window.addEventListener('resize', resizeCanvas, false);
+
+        function resizeCanvas(){
+       
+            canv.height = window.innerHeight;
+            canv.width = window.innerWidth;
+
+        class Point {
+            constructor() {
+                this.x = 0.0;
+                this.y = 0.0;
+            }
+        }
+
+        class Ship {
+            constructor(ship) {
+                this.shipname = ship;
+                this.pos = new Point;
+                this.pos_delta = new Point;
+                this.heading = 90 / 180 * Math.PI;
+                this.radius = SHIP_SIZE / 2;
+                this.rotation = 0;
+                this.thrusting = false;
+                this.thrust = new Point;
+                this.json = {};
+            }
+            drawShip() {
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = SHIP_SIZE / 20;
+                ctx.beginPath();
+                ctx.moveTo (
+                    this.pos.x + 4 / 3 * this.radius * Math.cos(this.heading),
+                    this.pos.y - 4 / 3 * this.radius * Math.sin(this.heading)
+                );
+                ctx.lineTo (
+                    this.pos.x - this.rotation * (2/3 * Math.cos(this.heading) + Math.sin(this.headding)),
+                    this.pos.y + this.rotation * (2/3 * Math.sin(this.headding) + Math.cos(this.headding))
+                );
+                ctx.lineTo(
+                    this.pos.x - this.rotation * (2/3 * Math.cos(this.headding) - Math.sin(this.headding)),
+                    this.pos.y + this.rotation * (2/3 * Math.sin(this.heading) + Math.cos(this.headding))
+                );
+                ctx.closePath();
+                ctx.stroke();
+            }
+            drawShipTail(){
+                ctx.fillStyle = "red";
+                ctx.strokeStyle = "yellow";
+                ctx.lineWidth = SHIP_SIZE / 10;
+                ctx.beginPath();
+                ctx.moveTo(
+                    this.pos.x - this.radius * (2/3 * Math.cos(this.heading) + 0.5 * Math.sin(this.heading)),
+                    this.pos.y + this.radius * (2/3 * Math.sin(this.heading) - 0.5 * Math.cos(this.heading))
+                );
+                ctx.lineTo(
+                    this.pos.x - this.radius * 5/3 * Math.cos(this.heading),
+                    this.pos.y + this.radius * 5/3 * Math.sin(this.heading),
+                );
+                ctx.lineTo(
+                    this.pos.x - this.radius * (2/3 * Math.cos(this.heading) - 0.5 * Math.sin(this.heading)),
+                    this.pos.y + this.radius * (2/3 * Math.sin(this.heading) + 0.5 * Math.cos(this.heading))
+                );
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            json() {
+                return json = {
+                    "${this.shipname}": {
+                        "pos": {
+                            "x": this.pos.x,
+                            "y": this.pos.y
+                        },
+                        "pos": {
+                            "x": this.pos.x,
+                            "y": this.pos.y
+                        },
+                        "heading": this.heading,
+                        "accleration": this.acceleration
+                    }
+                };
+            }
+        }
+        
+        ship = new Ship();
+
+        // set up event handlers
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+
+        // set up the game loop
+        setInterval(update, 1000 / FPS);
+
+        function keyDown(/** @type {KeyboardEvent} */ ev) {
+            switch(ev.keyCode) {
+                case 37: // left arrow (rotate ship left)
+                    ship.rotation = TURN_SPEED / 180 * Math.PI / FPS;
+                    break;
+                case 38: // up arrow (thrust the ship forward)
+                    ship.thrusting = true;
+                    break;
+                case 39: // right arrow (rotate ship right)
+                    ship.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
+                    break;
+            }
+        }
+
+        function keyUp(/** @type {KeyboardEvent} */ ev) {
+            switch(ev.keyCode) {
+                case 37: // left arrow (stop rotating left)
+                    ship.rotation = 0;
+                    break;
+                case 38: // up arrow (stop thrusting)
+                    ship.thrusting = false;
+                    break;
+                case 39: // right arrow (stop rotating right)
+                    ship.rotation = 0;
+                    break;
+            }
+        }
+
+        function update() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0,0, canv.width, canv.height);
+
+            if (ship.thrusting) {
+                ship.thrust.x += SHIP_THRUST * Math.cos(ship.heading) / FPS;
+                ship.thrust.y -= SHIP_THRUST * Math.sin(ship.heading) / FPS;
+                ship.drawShipTail();
+                
+            } else {
+                ship.thrust.x -= FRICTION * ship.thrust.x / FPS;
+                ship.thrust.y -= FRICTION * ship.thrust.y / FPS;
+            }
+           
+            ship.drawShip();
+            ship.heading += ship.rotation;
+            ship.pos.x += ship.thrust.x;
+            ship.pos.y += ship.thrust.y;
+
+            if (ship.pos.x < 0 - ship.radius){
+                ship.pos.x = canv.width + ship.radius;
+            } else if (ship.pos.x > canv.width + ship.radius) {
+                ship.pos.x = 0 - ship.radius;
+            }
+
+            if (ship.pos.y < 0 - ship.radius){
+                ship.pos.y = canv.height + ship.radius;
+            } else if (ship.pos.y > canv.height + ship.radius) {
+                ship.pos.y = 0 - ship.radius;
+            }
+        }
+}
+    </script>
+</body>
+
+</html>
