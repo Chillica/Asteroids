@@ -1,6 +1,6 @@
 class Ship {
     constructor(ship, color) {
-        this.shipname = ship;
+        this.name = ship;
         this.pos = new Point;
         this.pos_delta = new Point;
         this.heading = 90 / 180 * Math.PI;
