@@ -2,6 +2,7 @@ class Bullet {
     constructor() {
         this.pos = new Point;
         this.pos_delta = new Point;
+        this.dist = 0;
         this.ttl = 0.0;
     }
     json() {

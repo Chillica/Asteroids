@@ -1,6 +1,6 @@
 class GameState {
     constructor () {
-        this.myShip = new Ship("myShip");
+        this.ship = new Ship("myShip");
         this.enemy = new Ship("enemy", "red");
         this.asteroids = [];
         this.enemyjson = {};
