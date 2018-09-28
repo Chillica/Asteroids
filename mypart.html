@@ -12,7 +12,7 @@
 <body>
     <canvas id="canvas"></canvas>
 
-    <script>
+    <!--<script>
         
         function concatJSON(arry) {
             var val = "";
@@ -101,7 +101,7 @@
             }
         }
 
-    </script>
+    </script>-->
     <script>
         const FPS = 30; // frames per second
         const FRICTION = 0.7; // friction coefficient of space (0 = no friction, 1 = lots of friction)
@@ -111,13 +111,10 @@
 
         var canv = document.getElementById("canvas");
         var ctx = canv.getContext("2d");
+        
+        canv.height = window.innerHeight;
+        canv.width = window.innerWidth;
 
-        window.addEventListener('resize', resizeCanvas, false);
-
-        function resizeCanvas(){
-       
-            canv.height = window.innerHeight;
-            canv.width = window.innerWidth;
 
         class Point {
             constructor() {
@@ -127,7 +124,7 @@
         }
 
         class Ship {
-            constructor(ship) {
+            constructor(ship, color) {
                 this.shipname = ship;
                 this.pos = new Point;
                 this.pos_delta = new Point;
@@ -136,10 +133,14 @@
                 this.rotation = 0;
                 this.thrusting = false;
                 this.thrust = new Point;
+                this.color = color;
                 this.json = {};
             }
             drawShip() {
-                ctx.strokeStyle = "white";
+                if(this.color === undefined)
+                    ctx.strokeStyle = "white";
+                else
+                    ctx.strokeStyle = this.color;
                 ctx.lineWidth = SHIP_SIZE / 20;
                 ctx.beginPath();
                 ctx.moveTo (
@@ -147,12 +148,12 @@
                     this.pos.y - 4 / 3 * this.radius * Math.sin(this.heading)
                 );
                 ctx.lineTo (
-                    this.pos.x - this.rotation * (2/3 * Math.cos(this.heading) + Math.sin(this.headding)),
-                    this.pos.y + this.rotation * (2/3 * Math.sin(this.headding) + Math.cos(this.headding))
+                    this.pos.x - this.radius * (2 / 3 * Math.cos(this.heading) + Math.sin(this.heading)),
+                    this.pos.y + this.radius * (2 / 3 * Math.sin(this.heading) - Math.cos(this.heading))
                 );
                 ctx.lineTo(
-                    this.pos.x - this.rotation * (2/3 * Math.cos(this.headding) - Math.sin(this.headding)),
-                    this.pos.y + this.rotation * (2/3 * Math.sin(this.heading) + Math.cos(this.headding))
+                    this.pos.x - this.radius * (2 / 3 * Math.cos(this.heading) - Math.sin(this.heading)),
+                    this.pos.y + this.radius * (2 / 3 * Math.sin(this.heading) + Math.cos(this.heading))
                 );
                 ctx.closePath();
                 ctx.stroke();
@@ -178,6 +179,33 @@
                 ctx.fill();
                 ctx.stroke();
             }
+            move() {
+                if (this.thrusting) {
+                    this.thrust.x += SHIP_THRUST * Math.cos(this.heading) / FPS;
+                    this.thrust.y -= SHIP_THRUST * Math.sin(this.heading) / FPS;
+                    this.drawShipTail();
+                    
+                } else {
+                    this.thrust.x -= FRICTION * this.thrust.x / FPS;
+                    this.thrust.y -= FRICTION * this.thrust.y / FPS;
+                }
+                this.drawShip();
+                this.heading += this.rotation;
+                this.pos.x += this.thrust.x;
+                this.pos.y += this.thrust.y;
+
+                if (this.pos.x < 0 - this.radius){
+                    this.pos.x = canv.width + this.radius;
+                } else if (this.pos.x > canv.width + this.radius) {
+                    this.pos.x = 0 - this.radius;
+                }
+
+                if (this.pos.y < 0 - this.radius){
+                    this.pos.y = canv.height + this.radius;
+                } else if (this.pos.y > canv.height + this.radius) {
+                    this.pos.y = 0 - this.radius;
+                }
+            }
             json() {
                 return json = {
                     "${this.shipname}": {
@@ -196,11 +224,18 @@
             }
         }
         
-        ship = new Ship();
+        ship = new Ship("myShip");
+        ship2 = new Ship("enemyShip", "red");
 
         // set up event handlers
         document.addEventListener("keydown", keyDown);
         document.addEventListener("keyup", keyUp);
+        
+        window.addEventListener('resize', resizeCanvas, false);
+        function resizeCanvas(){
+            canv.height = window.innerHeight;
+            canv.width = window.innerWidth;
+        }
 
         // set up the game loop
         setInterval(update, 1000 / FPS);
@@ -216,6 +251,15 @@
                 case 39: // right arrow (rotate ship right)
                     ship.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
                     break;
+                case 65:
+                    ship2.rotation = TURN_SPEED / 180 * Math.PI / FPS;
+                    break;
+                case 87:
+                    ship2.thrusting = true;
+                    break;
+                case 68:
+                    ship2.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
+                    break;
             }
         }
 
@@ -230,41 +274,25 @@
                 case 39: // right arrow (stop rotating right)
                     ship.rotation = 0;
                     break;
+                case 65:
+                    ship2.rotation = 0;
+                    break;
+                case 87:
+                    ship2.thrusting = false;
+                    break;
+                case 68:
+                    ship2.rotation = 0;
+                    break;
             }
         }
 
         function update() {
             ctx.fillStyle = "black";
-            ctx.fillRect(0,0, canv.width, canv.height);
+            ctx.fillRect(0, 0, canv.width, canv.height);
 
-            if (ship.thrusting) {
-                ship.thrust.x += SHIP_THRUST * Math.cos(ship.heading) / FPS;
-                ship.thrust.y -= SHIP_THRUST * Math.sin(ship.heading) / FPS;
-                ship.drawShipTail();
-                
-            } else {
-                ship.thrust.x -= FRICTION * ship.thrust.x / FPS;
-                ship.thrust.y -= FRICTION * ship.thrust.y / FPS;
-            }
-           // This is a comment
-            ship.drawShip();
-            ship.heading += ship.rotation;
-            ship.pos.x += ship.thrust.x;
-            ship.pos.y += ship.thrust.y;
-
-            if (ship.pos.x < 0 - ship.radius){
-                ship.pos.x = canv.width + ship.radius;
-            } else if (ship.pos.x > canv.width + ship.radius) {
-                ship.pos.x = 0 - ship.radius;
-            }
-
-            if (ship.pos.y < 0 - ship.radius){
-                ship.pos.y = canv.height + ship.radius;
-            } else if (ship.pos.y > canv.height + ship.radius) {
-                ship.pos.y = 0 - ship.radius;
-            }
+            ship.move();
+            ship2.move();
         }
-}
     </script>
 </body>
 
