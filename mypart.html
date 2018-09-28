@@ -109,6 +109,11 @@
         const SHIP_THRUST = 5; // acceleration of the ship in pixels per second per second
         const TURN_SPEED = 360; // turn speed in degrees per second
 
+        const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width
+        const LASER_EXPLODE_DUR = 0.1; // duration of the lasers' explosion in seconds
+        const LASER_MAX = 10; // maximum number of lasers on screen at once
+        const LASER_SPD = 500; // speed of lasers in pixels per second
+
         var canv = document.getElementById("canvas");
         var ctx = canv.getContext("2d");
         
@@ -131,6 +136,8 @@
                 this.heading = 90 / 180 * Math.PI;
                 this.radius = SHIP_SIZE / 2;
                 this.rotation = 0;
+                this.canShoot = true;
+                this.lasers = [];
                 this.thrusting = false;
                 this.thrust = new Point;
                 this.color = color;
@@ -206,6 +213,86 @@
                     this.pos.y = 0 - this.radius;
                 }
             }
+            shootLaser() {
+                // create the laser object
+                if (this.canShoot && this.lasers.length < LASER_MAX) {
+                    this.lasers.push({ // from the nose of the ship
+                        x: this.pos.x + 4 / 3 * this.radius * Math.cos(this.heading),
+                        y: this.pos.y - 4 / 3 * this.radius * Math.sin(this.heading),
+                        xv: LASER_SPD * Math.cos(this.heading) / FPS,
+                        yv: -LASER_SPD * Math.sin(this.heading) / FPS,
+                        dist: 0,
+                        explodeTime: 0
+                    });
+                }
+                // prevent further shooting
+                this.canShoot = false;
+            }
+            drawLaser() {
+                // draw the lasers
+                for (var i = 0; i < this.lasers.length; i++) {
+                    if (this.lasers[i].explodeTime == 0) {
+                        ctx.fillStyle = "salmon";
+                        ctx.beginPath();
+                        ctx.arc(this.lasers[i].x, this.lasers[i].y, SHIP_SIZE / 15, 0, Math.PI * 2, false);
+                        ctx.fill();
+                    } else {
+                        // draw the eplosion
+                        ctx.fillStyle = "orangered";
+                        ctx.beginPath();
+                        ctx.arc(this.lasers[i].x, this.lasers[i].y, this.radius * 0.75, 0, Math.PI * 2, false);
+                        ctx.fill();
+                        ctx.fillStyle = "salmon";
+                        ctx.beginPath();
+                        ctx.arc(this.lasers[i].x, this.lasers[i].y, this.radius * 0.5, 0, Math.PI * 2, false);
+                        ctx.fill();
+                        ctx.fillStyle = "pink";
+                        ctx.beginPath();
+                        ctx.arc(this.lasers[i].x, this.lasers[i].y, this.radius * 0.25, 0, Math.PI * 2, false);
+                        ctx.fill();
+                    }
+                }
+                // move the lasers
+                for (var i = this.lasers.length - 1; i >= 0; i--) {
+                    
+                    // check distance travelled
+                    if (this.lasers[i].dist > LASER_DIST * canv.width) {
+                        this.lasers.splice(i, 1);
+                        continue;
+                    }
+
+                    // handle the explosion
+                    if (this.lasers[i].explodeTime > 0) {
+                        this.lasers[i].explodeTime--;
+
+                        // destroy the laser after the duration is up
+                        if (this.lasers[i].explodeTime == 0) {
+                            this.lasers.splice(i, 1);
+                            continue;
+                        }
+                    } else {
+                        // move the laser
+                        this.lasers[i].x += this.lasers[i].xv;
+                        this.lasers[i].y += this.lasers[i].yv;
+
+                        // calculate the distance travelled
+                        this.lasers[i].dist += Math.sqrt(Math.pow(this.lasers[i].xv, 2) + Math.pow(this.lasers[i].yv, 2));
+                    }
+
+                    // handle edge of screen
+                    if (this.lasers[i].x < 0) {
+                        this.lasers[i].x = canv.width;
+                    } else if (this.lasers[i].x > canv.width) {
+                        this.lasers[i].x = 0;
+                    }
+                    if (this.lasers[i].y < 0) {
+                        this.lasers[i].y = canv.height;
+                    } else if (this.lasers[i].y > canv.height) {
+                        this.lasers[i].y = 0;
+                    }
+                }
+
+            }
             json() {
                 return json = {
                     "${this.shipname}": {
@@ -225,7 +312,7 @@
         }
         
         ship = new Ship("myShip");
-        ship2 = new Ship("enemyShip", "red");
+        //ship2 = new Ship("enemyShip", "red");
 
         // set up event handlers
         document.addEventListener("keydown", keyDown);
@@ -242,6 +329,9 @@
 
         function keyDown(/** @type {KeyboardEvent} */ ev) {
             switch(ev.keyCode) {
+                case 32: // space bar (shoot laser)
+                    ship.shootLaser();
+                    break;
                 case 37: // left arrow (rotate ship left)
                     ship.rotation = TURN_SPEED / 180 * Math.PI / FPS;
                     break;
@@ -265,6 +355,9 @@
 
         function keyUp(/** @type {KeyboardEvent} */ ev) {
             switch(ev.keyCode) {
+                case 32: // space bar (allow shooting again)
+                    ship.canShoot = true;
+                    break;
                 case 37: // left arrow (stop rotating left)
                     ship.rotation = 0;
                     break;
@@ -291,7 +384,8 @@
             ctx.fillRect(0, 0, canv.width, canv.height);
 
             ship.move();
-            ship2.move();
+            //ship2.move();
+            ship.drawLaser();
         }
     </script>
 </body>
