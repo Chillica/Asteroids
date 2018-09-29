@@ -12,6 +12,8 @@ class Ship {
         this.thrust = new Point;
         this.color = color;
         this.json = {};
+        this.pos.x = canv.width / 2;
+        this.pos.y = canv.height / 2;
     }
     drawShip() {
         if(this.color === undefined)
