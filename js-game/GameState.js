@@ -17,6 +17,20 @@ class GameState {
             ]
         }
     }
+    createAsteroidBelt() {
+        for (var i = 0; i < ROID_NUM; i++) {
+            var asteroid = new Asteroid();
+            // random asteroid location (not touching spaceship)
+            while (this.distBetweenPoints(this.ship.pos.x, this.ship.pos.y, asteroid.pos.x, asteroid.pos.y) < ROID_SIZE * 2 + this.ship.radius)
+            {
+                asteroid.newPos();
+            }
+            this.asteroids.push(asteroid);
+        }
+    }
+    distBetweenPoints(x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
     concatJSON(arry) {
         var val = "";
         for (i = 0; i < this.arry.length; i++) {

@@ -3,6 +3,9 @@ document.addEventListener("keydown", keyDown);
 document.addEventListener("keyup", keyUp);
 window.addEventListener('resize', resizeCanvas, false);
 
+// set up the game loop
+setInterval(update, 1000 / FPS);
+
 var canv = document.getElementById("canvas");
 var ctx = canv.getContext("2d");
 
@@ -15,8 +18,10 @@ function resizeCanvas(){
 }
 
 gameState = new GameState();
+asteroid = new Asteroid();
 //ship = new Ship("myShip");
 //ship2 = new Ship("enemyShip", "red");
+gameState.createAsteroidBelt();
 
 function keyDown(/** @type {KeyboardEvent} */ ev) {
     switch(ev.keyCode) {
@@ -69,5 +74,17 @@ function keyUp(/** @type {KeyboardEvent} */ ev) {
             ship2.rotation = 0;
             break;
             */
+    }
+}
+
+function update() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
+    gameState.ship.move();
+    gameState.ship.drawLaser();
+    //ship2.move();
+    for (var j=0; j < this.gameState.asteroids.length; j++)
+    {
+        this.gameState.asteroids[j].move();
     }
 }
