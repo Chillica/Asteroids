@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+#canvas {
+    max-width: 100vw;
+    min-height: 100vh;
+    background: #000000;
+    position: relative;
+}
