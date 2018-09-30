@@ -6,8 +6,8 @@ class Ship {
         this.heading = 90 / 180 * Math.PI;
         this.radius = SHIP_SIZE / 2;
         this.rotation = 0;
-        this.canShoot = true;
         this.lasers = [];
+        this.canShoot = true;
         this.thrusting = false;
         this.thrust = new Point;
         this.color = color;
@@ -37,6 +37,29 @@ class Ship {
         ctx.closePath();
         ctx.stroke();
     }
+    drawShipExplode() {
+        // draw the explosion (concentric circles of different colours)
+        ctx.fillStyle = "darkred";
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius * 1.7, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius * 1.4, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.fillStyle = "orange";
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius * 1.1, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius * 0.8, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius * 0.5, 0, Math.PI * 2, false);
+        ctx.fill();
+    }
     drawShipTail(){
         ctx.fillStyle = "red";
         ctx.strokeStyle = "yellow";
@@ -59,6 +82,9 @@ class Ship {
         ctx.stroke();
     }
     move() {
+        this.blinkOn = this.blinkNum % 2 == 0;
+        this.exploding = this.explodeTime > 0;
+
         if (this.thrusting) {
             this.thrust.x += SHIP_THRUST * Math.cos(this.heading) / FPS;
             this.thrust.y -= SHIP_THRUST * Math.sin(this.heading) / FPS;
@@ -69,9 +95,10 @@ class Ship {
             this.thrust.y -= FRICTION * this.thrust.y / FPS;
         }
         this.drawShip();
+        
         this.heading += this.rotation;
         this.pos.x += this.thrust.x;
-        this.pos.y += this.thrust.y;
+        this.pos.y += this.thrust.y;     
 
         if (this.pos.x < 0 - this.radius){
             this.pos.x = canv.width + this.radius;

@@ -78,6 +78,7 @@ function keyUp(/** @type {KeyboardEvent} */ ev) {
 }
 
 function update() {
+
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
     gameState.ship.move();
@@ -87,4 +88,5 @@ function update() {
     {
         this.gameState.asteroids[j].move();
     }
+
 }
