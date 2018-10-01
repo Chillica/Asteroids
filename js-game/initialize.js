@@ -18,7 +18,6 @@ function resizeCanvas(){
 }
 
 gameState = new GameState();
-asteroid = new Asteroid();
 //ship = new Ship("myShip");
 //ship2 = new Ship("enemyShip", "red");
 gameState.createAsteroidBelt();
@@ -78,15 +77,13 @@ function keyUp(/** @type {KeyboardEvent} */ ev) {
 }
 
 function update() {
+    gameState.resetState();
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
-    gameState.ship.move();
-    gameState.ship.drawLaser();
-    //ship2.move();
-    for (var j=0; j < this.gameState.asteroids.length; j++)
-    {
-        this.gameState.asteroids[j].move();
-    }
+    //gameState.ship.move();
+    //gameState.ship.drawLaser();
+    gameState.moveAsteroids();
+    gameState.collide();
 
 }

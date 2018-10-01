@@ -10,7 +10,7 @@ const SHIP_SIZE = 30; // ship height in pixels default 30
 const SHIP_THRUST = 5; // acceleration of the ship in pixels per second per second default 5
 const SHIP_BLINK_DUR = 0.1; // duration in seconds of a single blink during ship's invisibility
 const SHIP_EXPLODE_DUR = 0.3; // duration of the ship's explosion in seconds
-const SHIP_INV_DUR = 3; // duration of the ship's invisibility in seconds
+const SHIP_INV_DUR = 4; // duration of the ship's invisibility in seconds
 const TURN_SPEED = 360; // turn speed in degrees per second default 360
 
 const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width default 0.6

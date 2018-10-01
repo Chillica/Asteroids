@@ -6,12 +6,19 @@ class Ship {
         this.heading = 90 / 180 * Math.PI;
         this.radius = SHIP_SIZE / 2;
         this.rotation = 0;
+
+        this.blinkNum = Math.ceil(SHIP_INV_DUR / SHIP_BLINK_DUR);
+        this.blinkTime = Math.ceil(SHIP_BLINK_DUR * FPS);
+        this.explodeTime = 0;
+
         this.lasers = [];
         this.canShoot = true;
         this.thrusting = false;
         this.thrust = new Point;
         this.color = color;
         this.json = {};
+
+        // Making the position the center on start of ship
         this.pos.x = canv.width / 2;
         this.pos.y = canv.height / 2;
     }
@@ -81,10 +88,10 @@ class Ship {
         ctx.fill();
         ctx.stroke();
     }
+    explodeShip() {
+        this.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * FPS);
+    }
     move() {
-        this.blinkOn = this.blinkNum % 2 == 0;
-        this.exploding = this.explodeTime > 0;
-
         if (this.thrusting) {
             this.thrust.x += SHIP_THRUST * Math.cos(this.heading) / FPS;
             this.thrust.y -= SHIP_THRUST * Math.sin(this.heading) / FPS;
