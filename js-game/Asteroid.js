@@ -1,11 +1,12 @@
 class Asteroid {
     constructor() {
+        this.lvlMult = 1;
         this.pos = new Point();
         this.pos_delta = new Point();
         this.pos.x = Math.floor(Math.random() * canv.width);
         this.pos.y = Math.floor(Math.random() * canv.height);
-        this.pos_delta.x = Math.random() * ROID_SPD / FPS * (Math.random() < 0.5 ? 1 : -1);
-        this.pos_delta.y = Math.random() * ROID_SPD / FPS * (Math.random() < 0.5 ? 1 : -1);
+        this.pos_delta.x = Math.random() * ROID_SPD * this.lvlMult / FPS * (Math.random() < 0.5 ? 1 : -1);
+        this.pos_delta.y = Math.random() * ROID_SPD * this.lvlMult / FPS * (Math.random() < 0.5 ? 1 : -1);
         this.radius = ROID_SIZE / 2;
         this.heading = Math.random() * Math.PI * 2;
         this.offs = [];

@@ -6,11 +6,44 @@ class GameState {
         this.enemyjson = {};
         this.blinkOn = true;
         this.exploding = false;
+        this.level = 0;
+        this.shipdeaths = 0;
+        this.textAlpha = 1.0;
+    }
+    levelCheck() {
+        if (this.asteroids.length == 0)
+        {
+            this.level += 1;
+            this.textAlpha = 1.0;
+            this.createAsteroidBelt();
+            console.log("Level: " + this.level);
+        }
+        else if (this.shipdeaths > 5){
+            this.level = 0;
+            this.shipdeaths = 0;
+            this.asteroids = [];
+            this.textAlpha = 1.0;
+            this.createAsteroidBelt();
+        }
+    }
+    drawGameText() {
+        var text = "Level " + (this.level + 1);
+        // draw the game text
+        if (this.textAlpha >= 0) {
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "rgba(255, 255, 255, " + this.textAlpha + ")";
+            ctx.font = "small-caps " + TEXT_SIZE + "px dejavu sans mono";
+            ctx.fillText(text, canv.width / 2, canv.height * 0.75);
+            this.textAlpha -= (1.0 / TEXT_FADE_TIME / FPS);
+        }
     }
     createAsteroidBelt() {
-        for (var i = 0; i < ROID_NUM; i++) {
+        for (var i = 0; i < ROID_NUM + this.level; i++) {
             var asteroid = new Asteroid();
             // random asteroid location (not touching spaceship)
+            asteroid.lvlMult = 1 + 0.2 * this.level;
+            console.log("Asteroid Speed " + asteroid.lvlMult);
             while (this.distBetweenPoints(this.ship.pos.x, this.ship.pos.y, asteroid.pos.x, asteroid.pos.y) < ROID_SIZE * 2 + this.ship.radius)
             {
                 asteroid.newPos();
@@ -32,12 +65,11 @@ class GameState {
         this.exploding = this.ship.explodeTime > 0;
     }
     collide() {
-        
-        //this.destroyAsteroid();
+        this.levelCheck();
         this.ship.thrustMove();
         this.ship.drawLaser();
         this.laserHits();
-
+        this.drawGameText();
         if (!this.exploding)      
         {
             if (this.blinkOn)
@@ -72,6 +104,7 @@ class GameState {
             if(this.ship.explodeTime == 0)
             {
                 this.ship = new Ship();
+                this.shipdeaths += 1;
             }
         }
         this.ship.handleScreenEdge();

@@ -10,7 +10,7 @@ const SHIP_SIZE = 30; // ship height in pixels default 30
 const SHIP_THRUST = 5; // acceleration of the ship in pixels per second per second default 5
 const SHIP_BLINK_DUR = 0.1; // duration in seconds of a single blink during ship's invisibility
 const SHIP_EXPLODE_DUR = 0.3; // duration of the ship's explosion in seconds
-const SHIP_INV_DUR = 4; // duration of the ship's invisibility in seconds
+const SHIP_INV_DUR = 3; // duration of the ship's invisibility in seconds
 const TURN_SPEED = 360; // turn speed in degrees per second default 360
 
 const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width default 0.6
@@ -25,6 +25,9 @@ const ROID_SIZE = 100; // starting size of asteroids in pixels
 const ROID_SPD = 50; // max starting speed of asteroids in pixels per second
 const ROID_VERT = 10; // average number of vertices on each asteroid
 
+
+const TEXT_FADE_TIME = 2.5; // text fade time in seconds
+const TEXT_SIZE = 40; // text font height in pixels
 
 /* const ROID_PTS_LGE = 20; // points scored for a large asteroid
 const ROID_PTS_MED = 50; // points scored for a medium asteroid

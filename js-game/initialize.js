@@ -36,6 +36,13 @@ function keyDown(/** @type {KeyboardEvent} */ ev) {
         case 39: // right arrow (rotate ship right)
             gameState.ship.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
             break;
+        case 87:
+            gameState.asteroids = [];
+            break;
+        case 65:
+            gameState.ship = new Ship();
+            gameState.shipdeaths += 1;
+            break;
         /*case 65:
             ship2.rotation = TURN_SPEED / 180 * Math.PI / FPS;
             break;
