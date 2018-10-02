@@ -1,5 +1,6 @@
 const FPS = 30; // frames per second default 30
 const FRICTION = 0.7; // friction coefficient of space (0 = no friction, 1 = lots of friction) default 0.7
+const GAME_LIVES = 3;
 
 const SHIP_NAME = "myShip";
 const SHIP_COLOR = "white";

@@ -18,7 +18,7 @@ class GameState {
             this.createAsteroidBelt();
             console.log("Level: " + this.level);
         }
-        else if (this.shipdeaths > 5){
+        else if (this.shipdeaths > GAME_LIVESGIT){
             this.level = 0;
             this.shipdeaths = 0;
             this.asteroids = [];
