@@ -91,7 +91,7 @@ class Ship {
     explodeShip() {
         this.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * FPS);
     }
-    move() {
+    thrustMove() {
         if (this.thrusting) {
             this.thrust.x += SHIP_THRUST * Math.cos(this.heading) / FPS;
             this.thrust.y -= SHIP_THRUST * Math.sin(this.heading) / FPS;
@@ -101,12 +101,14 @@ class Ship {
             this.thrust.x -= FRICTION * this.thrust.x / FPS;
             this.thrust.y -= FRICTION * this.thrust.y / FPS;
         }
-        this.drawShip();
         
+    }
+    move() {
         this.heading += this.rotation;
         this.pos.x += this.thrust.x;
-        this.pos.y += this.thrust.y;     
-
+        this.pos.y += this.thrust.y;
+    }
+    handleScreenEdge() {
         if (this.pos.x < 0 - this.radius){
             this.pos.x = canv.width + this.radius;
         } else if (this.pos.x > canv.width + this.radius) {

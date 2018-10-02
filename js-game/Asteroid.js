@@ -6,7 +6,6 @@ class Asteroid {
         this.pos.y = Math.floor(Math.random() * canv.height);
         this.pos_delta.x = Math.random() * ROID_SPD / FPS * (Math.random() < 0.5 ? 1 : -1);
         this.pos_delta.y = Math.random() * ROID_SPD / FPS * (Math.random() < 0.5 ? 1 : -1);
-        this.size = 0.0;
         this.radius = ROID_SIZE / 2;
         this.heading = Math.random() * Math.PI * 2;
         this.offs = [];
@@ -15,7 +14,11 @@ class Asteroid {
         for (var i = 0; i < this.vert; i++) {
             this.offs.push(Math.random() * ROID_JAG * 2 + 1 - ROID_JAG);
         }
-
+    }
+    setArea(xpos, ypos, astradius) {
+        this.pos.x = xpos;
+        this.pos.y = ypos;
+        this.radius = astradius;
     }
     newPos() {
         this.pos.x = Math.floor(Math.random() * canv.width);

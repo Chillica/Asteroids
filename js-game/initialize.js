@@ -83,7 +83,5 @@ function update() {
     ctx.fillRect(0, 0, canv.width, canv.height);
     //gameState.ship.move();
     //gameState.ship.drawLaser();
-    gameState.moveAsteroids();
     gameState.collide();
-
 }
