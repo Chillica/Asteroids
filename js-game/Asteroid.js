@@ -69,7 +69,7 @@ class Asteroid {
         ctx.stroke();
     }
     json() {
-        return this.json = {
+        return [ {
             "pos": {
                 "x": this.pos.x,
                 "y": this.pos.y
@@ -79,6 +79,6 @@ class Asteroid {
                 "y": this.pos_delta.y
             },
             "size": this.size
-        }
+        }];
     }
 }

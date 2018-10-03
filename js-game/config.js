@@ -16,12 +16,13 @@ const TURN_SPEED = 360; // turn speed in degrees per second default 360
 
 const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width default 0.6
 const LASER_EXPLODE_DUR = 0.1; // duration of the lasers' explosion in seconds default 0.1
-const LASER_MAX = 10; // maximum number of lasers on screen at once default 10
-const LASER_SPD = 500; // speed of lasers in pixels per second default 500
+const LASER_SPD = 600; // speed of lasers in pixels per second default 500
+const LASER_MAX = 20; // maximum number of lasers on screen at once default 10
+const LASER_UNLIMITED = false; // true or false value use in conjunction with LASER_MAX;
 
 
 const ROID_JAG = 0.4; // jaggedness of the asteroids (0 = none, 1 = lots)
-const ROID_NUM = 3; // starting number of asteroids
+const ROID_NUM = 5; // starting number of asteroids
 const ROID_SIZE = 100; // starting size of asteroids in pixels
 const ROID_SPD = 50; // max starting speed of asteroids in pixels per second
 const ROID_VERT = 10; // average number of vertices on each asteroid

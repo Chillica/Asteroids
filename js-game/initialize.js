@@ -18,8 +18,9 @@ function resizeCanvas(){
 }
 
 gameState = new GameState();
-//ship = new Ship("myShip");
-//ship2 = new Ship("enemyShip", "red");
+//console.log("Asteroid JSON: " + gameState.asteroid[0].json());
+//console.log("Game JSON: " + JSON.stringify(gameState.gamejson()));
+
 gameState.createAsteroidBelt();
 
 function keyDown(/** @type {KeyboardEvent} */ ev) {
@@ -42,6 +43,7 @@ function keyDown(/** @type {KeyboardEvent} */ ev) {
         case 65:
             gameState.ship = new Ship();
             gameState.shipdeaths += 1;
+            gameState.lives -= 1;
             break;
         /*case 65:
             ship2.rotation = TURN_SPEED / 180 * Math.PI / FPS;

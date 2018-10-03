@@ -9,6 +9,7 @@ class GameState {
         this.level = 0;
         this.shipdeaths = 0;
         this.textAlpha = 1.0;
+        this.lives = GAME_LIVES;
     }
     levelCheck() {
         if (this.asteroids.length == 0)
@@ -18,11 +19,12 @@ class GameState {
             this.createAsteroidBelt();
             console.log("Level: " + this.level);
         }
-        else if (this.shipdeaths > GAME_LIVES){
+        else if (this.shipdeaths >= GAME_LIVES){
             this.level = 0;
             this.shipdeaths = 0;
             this.asteroids = [];
             this.textAlpha = 1.0;
+            this.lives = GAME_LIVES;
             this.createAsteroidBelt();
         }
     }
@@ -36,6 +38,12 @@ class GameState {
             ctx.font = "small-caps " + TEXT_SIZE + "px dejavu sans mono";
             ctx.fillText(text, canv.width / 2, canv.height * 0.75);
             this.textAlpha -= (1.0 / TEXT_FADE_TIME / FPS);
+        }
+        // draw the lives
+        var lifeColour;
+        for (var i = 0; i < this.lives; i++) {
+            lifeColour = this.exploding && i == this.lives - 1 ? "red" : "white";
+            this.drawLives(SHIP_SIZE + i * SHIP_SIZE * 1.2, SHIP_SIZE, 0.5 * Math.PI, lifeColour);
         }
     }
     createAsteroidBelt() {
@@ -103,6 +111,7 @@ class GameState {
             this.ship.explodeTime--;
             if(this.ship.explodeTime == 0)
             {
+                this.lives -= 1;
                 this.ship = new Ship();
                 this.shipdeaths += 1;
             }
@@ -167,6 +176,26 @@ class GameState {
         // destroy the asteroid
         this.asteroids.splice(j, 1);
     }
+    drawLives(x, y, a, colour = "white") {
+        var shipsize = (SHIP_SIZE / 2);
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = SHIP_SIZE / 20;
+        ctx.beginPath();
+        ctx.moveTo( // nose of the ship
+            x + 4 / 3 * shipsize * Math.cos(a),
+            y - 4 / 3 * shipsize * Math.sin(a)
+        );
+        ctx.lineTo( // rear left
+            x - shipsize * (2 / 3 * Math.cos(a) + Math.sin(a)),
+            y + shipsize * (2 / 3 * Math.sin(a) - Math.cos(a))
+        );
+        ctx.lineTo( // rear right
+            x - shipsize * (2 / 3 * Math.cos(a) - Math.sin(a)),
+            y + shipsize * (2 / 3 * Math.sin(a) + Math.cos(a))
+        );
+        ctx.closePath();
+        ctx.stroke();
+    }
     concatJSON(arry) {
         var val = "";
         for (i = 0; i < this.arry.length; i++) {
@@ -177,15 +206,15 @@ class GameState {
         }
         return JSON.parse(val);
     }
-    get gamejson() {
-        return json = {
-            this:myShip.json,
-            this:enemy.json,
+    gamejson() {
+        return {
+            "myShip": this.myShip.json(),
+            "enemy": this.enemy.json(),
             "asteroids": [
-                concatJSON(this.asteroids)
+               { "asteroids": concatJSON(this.asteroids) }
             ],
             "bullets": [
-                this.concatJSON(this.myShip.lasers.concat(this.enemy.lasers))
+                {SHIP_NAME: this.concatJSON(this.myShip.lasers.concat(this.enemy.lasers))}
             ]
         }
     }

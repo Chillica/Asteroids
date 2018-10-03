@@ -135,7 +135,7 @@ class Ship {
             this.lasers.push(laser);
         }
         // prevent further shooting
-        this.canShoot = false;
+        this.canShoot = LASER_UNLIMITED;
     }
     drawLaser() {
         // draw the lasers
@@ -203,19 +203,17 @@ class Ship {
 
     }
     json() {
-        return json = {
-            "${this.shipname}": {
-                "pos": {
-                    "x": this.pos.x,
-                    "y": this.pos.y
-                },
-                "pos_delta": {
-                    "x": this.thrust.x,
-                    "y": this.thrust.y
-                },
-                "heading": this.heading,
-                "acceleration": (this.thrust.x + this.thrust.y) / 2
-            }
-        };
+        return [{
+            "pos": {
+                "x": this.pos.x,
+                "y": this.pos.y
+            },
+            "pos_delta": {
+                "x": this.thrust.x,
+                "y": this.thrust.y
+            },
+            "heading": this.heading,
+            "acceleration": (this.thrust.x + this.thrust.y) / 2
+        }];
     }
 }
