@@ -68,8 +68,8 @@ class Asteroid {
         ctx.closePath();
         ctx.stroke();
     }
-    json() {
-        return [ {
+    getjson() {
+        return {
             "pos": {
                 "x": this.pos.x,
                 "y": this.pos.y
@@ -78,7 +78,7 @@ class Asteroid {
                 "x": this.pos_delta.x,
                 "y": this.pos_delta.y
             },
-            "size": this.size
-        }];
+            "size": this.radius
+        };
     }
 }

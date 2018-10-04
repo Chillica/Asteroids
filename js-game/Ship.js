@@ -6,20 +6,24 @@ class Ship {
         this.heading = 90 / 180 * Math.PI;
         this.radius = SHIP_SIZE / 2;
         this.rotation = 0;
+        this.rotLeft = false;
+        this.rotRight = false;
 
+        this.blinkOn = true;
+        this.exploding = false;
         this.blinkNum = Math.ceil(SHIP_INV_DUR / SHIP_BLINK_DUR);
         this.blinkTime = Math.ceil(SHIP_BLINK_DUR * FPS);
         this.explodeTime = 0;
 
         this.lasers = [];
-        this.canShoot = true;
+        this.canShoot = false;
         this.thrusting = false;
         this.thrust = new Point;
         this.color = color;
         this.json = {};
 
         // Making the position the center on start of ship
-        this.pos.x = canv.width / 2;
+        this.pos.x = canv.width / 4;
         this.pos.y = canv.height / 2;
     }
     drawShip() {
@@ -101,6 +105,17 @@ class Ship {
             this.thrust.x -= FRICTION * this.thrust.x / FPS;
             this.thrust.y -= FRICTION * this.thrust.y / FPS;
         }
+        if (this.rotRight)
+        {
+            this.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
+        }
+        else if (this.rotLeft)
+        {
+            this.rotation = TURN_SPEED / 180 * Math.PI / FPS;
+        }
+        else {
+            this.rotation = 0;
+        }
         
     }
     move() {
@@ -134,8 +149,6 @@ class Ship {
 
             this.lasers.push(laser);
         }
-        // prevent further shooting
-        this.canShoot = LASER_UNLIMITED;
     }
     drawLaser() {
         // draw the lasers
@@ -202,8 +215,8 @@ class Ship {
         }
 
     }
-    json() {
-        return [{
+    getjson() {
+        return {
             "pos": {
                 "x": this.pos.x,
                 "y": this.pos.y
@@ -214,6 +227,6 @@ class Ship {
             },
             "heading": this.heading,
             "acceleration": (this.thrust.x + this.thrust.y) / 2
-        }];
+        };
     }
 }

@@ -10,6 +10,7 @@ class GameState {
         this.shipdeaths = 0;
         this.textAlpha = 1.0;
         this.lives = GAME_LIVES;
+        this.enemy.pos.x = canv.width * (3/4);
     }
     levelCheck() {
         if (this.asteroids.length == 0)
@@ -17,7 +18,6 @@ class GameState {
             this.level += 1;
             this.textAlpha = 1.0;
             this.createAsteroidBelt();
-            console.log("Level: " + this.level);
         }
         else if (this.shipdeaths >= GAME_LIVES){
             this.level = 0;
@@ -51,13 +51,16 @@ class GameState {
             var asteroid = new Asteroid();
             // random asteroid location (not touching spaceship)
             asteroid.lvlMult = 1 + 0.2 * this.level;
-            console.log("Asteroid Speed " + asteroid.lvlMult);
-            while (this.distBetweenPoints(this.ship.pos.x, this.ship.pos.y, asteroid.pos.x, asteroid.pos.y) < ROID_SIZE * 2 + this.ship.radius)
+            while (this.testPoints(this.ship, asteroid) || this.testPoints(this.enemy, asteroid))
             {
                 asteroid.newPos();
             }
             this.asteroids.push(asteroid);
         }
+    }
+    testPoints(ship, asteroid)
+    {
+        return this.distBetweenPoints(ship.pos.x, ship.pos.y, asteroid.pos.x, asteroid.pos.y) < ROID_SIZE * 2 + ship.radius;
     }
     moveAsteroids() {
         for (var j=0; j < this.asteroids.length; j++)
@@ -69,60 +72,83 @@ class GameState {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
     resetState() {
-        this.blinkOn = this.ship.blinkNum % 2 == 0;
-        this.exploding = this.ship.explodeTime > 0;
+        this.ship.blinkOn = this.ship.blinkNum % 2 == 0;
+        this.ship.exploding = this.ship.explodeTime > 0;
+        this.enemy.blinkOn = this.enemy.blinkNum % 2 == 0;
+        this.enemy.exploding = this.enemy.explodeTime > 0;
     }
-    collide() {
-        this.levelCheck();
-        this.ship.thrustMove();
-        this.ship.drawLaser();
-        this.laserHits();
-        this.drawGameText();
-        if (!this.exploding)      
+    testBlinkOn(ship)
+    {
+        if (!ship.exploding)
         {
-            if (this.blinkOn)
+            if (ship.blinkOn)
+                ship.drawShip();
+            if(ship.blinkNum > 0)
             {
-                this.ship.drawShip();
-            }
-            if(this.ship.blinkNum > 0)
-            {
-                this.ship.blinkTime--;
-                if(this.ship.blinkTime == 0)
+                ship.blinkTime--;
+                if(ship.blinkTime == 0)
                 {
-                    this.ship.blinkTime = Math.ceil(SHIP_BLINK_DUR * FPS);
-                    this.ship.blinkNum--;
+                    ship.blinkTime = Math.ceil(SHIP_BLINK_DUR * FPS);
+                    ship.blinkNum--;
                 }
             }
-            if (this.ship.blinkNum == 0)
+            if (ship.blinkNum == 0)
             {
                 for (var i = 0; i < this.asteroids.length; i++)
                 {
-                    if (this.distBetweenPoints(this.ship.pos.x, this.ship.pos.y, this.asteroids[i].pos.x, this.asteroids[i].pos.y) < this.ship.radius + this.asteroids[i].radius)
+                    if (this.distBetweenPoints(ship.pos.x, ship.pos.y, this.asteroids[i].pos.x, this.asteroids[i].pos.y) < ship.radius + this.asteroids[i].radius)
                     {
-                        this.ship.explodeShip();
+                        ship.explodeShip();
                         this.destroyAsteroid(i);
                         break;
                     }
                 }
             }
-            this.ship.move();
-        } else {
-            this.ship.drawShipExplode();
-            this.ship.explodeTime--;
-            if(this.ship.explodeTime == 0)
+            ship.move();
+        }else {
+            ship.drawShipExplode();
+            ship.explodeTime--;
+            if(ship.explodeTime == 0)
             {
-                this.lives -= 1;
-                this.ship = new Ship();
-                this.shipdeaths += 1;
+                if(ship.name == SHIP_NAME)
+                {
+                    this.lives -= 1;
+                    this.shipdeaths += 1;
+                    this.ship = new Ship(SHIP_NAME, SHIP_COLOR);
+                }
+                else
+                {
+                    this.enemy = new Ship(ENEMY_SHIP_NAME, ENEMY_SHIP_COLOR);
+                    this.enemy.pos.x = canv.width * (3/4);
+                }
             }
         }
-        this.ship.handleScreenEdge();
+        ship.handleScreenEdge();
+    }
+    collide() {
+        this.levelCheck();
+        this.ship.thrustMove();
+        this.ship.drawLaser();
+        this.ship.shootLaser();
+        this.enemy.thrustMove();
+        this.enemy.drawLaser();
+        this.enemy.shootLaser();
+        this.laserHits(this.ship, this.enemy);
+        this.laserHits(this.enemy, this.ship);
+        this.drawGameText();
+        this.testBlinkOn(this.ship);
+        this.testBlinkOn(this.enemy);
         this.moveAsteroids();
     }
-    laserHits()
+    laserHits(ship, enemy)
     {
         // detect laser hits on asteroids
-        var ax, ay, ar, lx, ly;
+        var ax, ay, ar, lx, ly, ex, ey, er;
+
+        ex = enemy.pos.x;
+        ey = enemy.pos.y;
+        er = enemy.radius;
+
         for (var i = this.asteroids.length - 1; i >= 0; i--) {
 
             // grab the asteroid properties
@@ -131,16 +157,23 @@ class GameState {
             ar = this.asteroids[i].radius;
 
             // loop over the lasers
-            for (var j = this.ship.lasers.length - 1; j >= 0; j--) {
+            for (var j = ship.lasers.length - 1; j >= 0; j--) {
 
                 // grab the laser properties
-                lx = this.ship.lasers[j].pos.x;
-                ly = this.ship.lasers[j].pos.y;
+                lx = ship.lasers[j].pos.x;
+                ly = ship.lasers[j].pos.y;
+
 
                 // detect hits
-                if (this.ship.lasers[j].ttl == 0 && this.distBetweenPoints(ax, ay, lx, ly) < ar) {
+                if (ship.lasers[j].ttl == 0 && this.distBetweenPoints(ax, ay, lx, ly) < ar) {
                     this.destroyAsteroid(i);
-                    this.ship.lasers[j].ttl = Math.ceil(LASER_EXPLODE_DUR * FPS);
+                    ship.lasers[j].ttl = Math.ceil(LASER_EXPLODE_DUR * FPS);
+                    break;
+                }
+                if (ship.lasers[j].ttl == 0 && this.distBetweenPoints(ex, ey, lx, ly) < er)
+                {
+                    if(enemy.blinkNum == 0)
+                        enemy.explodeShip();
                     break;
                 }
             }
@@ -197,25 +230,22 @@ class GameState {
         ctx.stroke();
     }
     concatJSON(arry) {
-        var val = "";
-        for (i = 0; i < this.arry.length; i++) {
-            if (i == this.arry.length - 1)
-                val.concat(this.arry[i].json);
+        var val = "[";
+        for (var i = 0; i < arry.length; i++) {
+            if (i == arry.length - 1)
+                val += JSON.stringify(arry[i].getjson());
             else
-                val.concat(this.arry[i].json + ",");
+                val += JSON.stringify(arry[i].getjson())+ ",";
         }
+        val += "]";
         return JSON.parse(val);
     }
     gamejson() {
         return {
-            "myShip": this.myShip.json(),
-            "enemy": this.enemy.json(),
-            "asteroids": [
-               { "asteroids": concatJSON(this.asteroids) }
-            ],
-            "bullets": [
-                {SHIP_NAME: this.concatJSON(this.myShip.lasers.concat(this.enemy.lasers))}
-            ]
+            "myShip": this.ship.getjson(),
+            "enemy": this.enemy.getjson(),
+            "asteroids": this.concatJSON(this.asteroids),
+            "bullets": this.concatJSON(this.ship.lasers.concat(this.enemy.lasers))
         }
     }
 }

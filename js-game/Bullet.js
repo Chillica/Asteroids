@@ -5,8 +5,8 @@ class Bullet {
         this.dist = 0;
         this.ttl = 0.0;
     }
-    json() {
-        return this.json = {
+    getjson() {
+        return {
             "pos": {
                 "x": this.pos.x,
                 "y": this.pos.y
@@ -16,6 +16,6 @@ class Bullet {
                 "y": this.pos_delta.y
             },
             "ttl": this.ttl
-        }
+        };
     }
 }

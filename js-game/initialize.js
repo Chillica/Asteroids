@@ -18,24 +18,23 @@ function resizeCanvas(){
 }
 
 gameState = new GameState();
-//console.log("Asteroid JSON: " + gameState.asteroid[0].json());
-//console.log("Game JSON: " + JSON.stringify(gameState.gamejson()));
 
 gameState.createAsteroidBelt();
+
 
 function keyDown(/** @type {KeyboardEvent} */ ev) {
     switch(ev.keyCode) {
         case 32: // space bar (shoot laser)
-            gameState.ship.shootLaser();
+            gameState.ship.canShoot = true;
             break;
         case 37: // left arrow (rotate ship left)
-            gameState.ship.rotation = TURN_SPEED / 180 * Math.PI / FPS;
+            gameState.ship.rotLeft = true;
             break;
         case 38: // up arrow (thrust the ship forward)
             gameState.ship.thrusting = true;
             break;
         case 39: // right arrow (rotate ship right)
-            gameState.ship.rotation = -TURN_SPEED / 180 * Math.PI / FPS;
+            gameState.ship.rotRight = true;
             break;
         case 87:
             gameState.asteroids = [];
@@ -44,6 +43,9 @@ function keyDown(/** @type {KeyboardEvent} */ ev) {
             gameState.ship = new Ship();
             gameState.shipdeaths += 1;
             gameState.lives -= 1;
+            break;
+        case 68:
+            console.log("Game JSON: " + JSON.stringify(gameState.gamejson()));
             break;
         /*case 65:
             ship2.rotation = TURN_SPEED / 180 * Math.PI / FPS;
@@ -61,16 +63,16 @@ function keyDown(/** @type {KeyboardEvent} */ ev) {
 function keyUp(/** @type {KeyboardEvent} */ ev) {
     switch(ev.keyCode) {
         case 32: // space bar (allow shooting again)
-            gameState.ship.canShoot = true;
+            gameState.ship.canShoot = LASER_UNLIMITED;
             break;
         case 37: // left arrow (stop rotating left)
-            gameState.ship.rotation = 0;
+            gameState.ship.rotLeft = false;
             break;
         case 38: // up arrow (stop thrusting)
             gameState.ship.thrusting = false;
             break;
         case 39: // right arrow (stop rotating right)
-            gameState.ship.rotation = 0;
+            gameState.ship.rotRight = false;
             break;
         /*case 65:
             ship2.rotation = 0;
@@ -84,10 +86,12 @@ function keyUp(/** @type {KeyboardEvent} */ ev) {
             */
     }
 }
-
 function update() {
     gameState.resetState();
-
+    //gameState.enemy.thrusting = true;
+    gameState.enemy.canShoot = true;
+    gameState.enemy.rotRight = true;
+    
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
     //gameState.ship.move();
